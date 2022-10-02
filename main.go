@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"os"
 	"strconv"
@@ -104,6 +105,16 @@ func (e *QueryCollector) Describe(ch chan<- *prometheus.Desc) {
 	}
 }
 
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+func RandomString() string {
+	b := make([]byte, rand.Intn(10)+10)
+	for i := range b {
+		b[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+	return string(b)
+}
+
 // Collect prometheus collect
 func (e *QueryCollector) Collect(ch chan<- prometheus.Metric) {
 	//var val float64
@@ -115,15 +126,14 @@ func (e *QueryCollector) Collect(ch chan<- prometheus.Metric) {
 
 			c := colly.NewCollector()
 			coinName := ""
-			c.OnHTML("div.official-name", func(e *colly.HTMLElement) {
+			c.OnHTML("main", func(e *colly.HTMLElement) {
 				coinName = ""
 				e.ForEach("div.price-container", func(_ int, el *colly.HTMLElement) {
-					coinName = e.ChildText("h2:nth-child(1)")
-
+					coinName = e.ChildText("h2.coin-name")
 				})
 
-				e.ForEach("div.coin-price-large", func(_ int, el *colly.HTMLElement) {
-					coinResult := e.ChildText("span:nth-child(1)")
+				e.ForEach("div.cion-item.coin-price-large", func(_ int, el *colly.HTMLElement) {
+					coinResult := el.ChildText("span")
 					coinResult = strings.ReplaceAll(coinResult, "$", "")
 					result, err := strconv.ParseFloat(coinResult, 8)
 					data[coinName] = fmt.Sprintf("%f", result)
@@ -134,9 +144,19 @@ func (e *QueryCollector) Collect(ch chan<- prometheus.Metric) {
 
 					}
 					ch <- prometheus.MustNewConstMetric(metric.metricDesc, prometheus.GaugeValue, result, coinName)
+					//})
 				})
 
 			})
+
+			c.OnRequest(func(r *colly.Request) {
+				r.Headers.Set("User-Agent", RandomString())
+			})
+
+			c.OnError(func(r *colly.Response, err error) {
+				fmt.Println("Request URL:", r.Request.URL, "failed with response:", r, "\nError:", err)
+			})
+
 			c.Visit(metric.URL[url])
 
 		}
