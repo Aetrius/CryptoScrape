@@ -1,14 +1,14 @@
 metrics:
   crypto:
     url: 
-      - "https://www.livecoinwatch.com/price/Avalanche-AVAX"
-      - "https://www.livecoinwatch.com/price/Ethereum-ETH"
-      - "https://www.livecoinwatch.com/price/Bitcoin-BTC"
-      - "https://www.livecoinwatch.com/price/API3-API3"
-      - "https://www.livecoinwatch.com/price/Fantom-FTM"
-      - "https://www.livecoinwatch.com/price/Dogecoin-DOGE"
-      - "https://www.livecoinwatch.com/price/USDCoin-USDC"
-      - "https://www.livecoinwatch.com/price/Cardano-ADA"
-      - "https://www.livecoinwatch.com/price/Cronos-CRO"
+      - "https://coinmarketcap.com/currencies/avalanche/"
+      - "https://coinmarketcap.com/currencies/ethereum/"
+      - "https://coinmarketcap.com/currencies/bitcoin/"
+      - "https://coinmarketcap.com/currencies/api3/"
+      - "https://coinmarketcap.com/currencies/fantom/"
+      - "https://coinmarketcap.com/currencies/dogecoin/"
+      - "https://coinmarketcap.com/currencies/usd-coin/"
+      - "https://coinmarketcap.com/currencies/cardano/"
+      - "https://coinmarketcap.com/currencies/cronos/"
     type: gauge
     description: "Exports the current coin value based on the web scrape"
