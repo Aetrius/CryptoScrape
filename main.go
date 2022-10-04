@@ -126,15 +126,20 @@ func (e *QueryCollector) Collect(ch chan<- prometheus.Metric) {
 
 			c := colly.NewCollector()
 			coinName := ""
-			c.OnHTML("main", func(e *colly.HTMLElement) {
+			c.OnHTML("div.main-content", func(e *colly.HTMLElement) {
 				coinName = ""
-				e.ForEach("div.price-container", func(_ int, el *colly.HTMLElement) {
-					coinName = e.ChildText("h2.coin-name")
+				e.ForEach("h1.priceHeading", func(_ int, el *colly.HTMLElement) {
+					coinName = e.ChildText("h1")
+
+					arrTitle := strings.Split(coinName, "Price")
+					coinName = strings.TrimSpace(arrTitle[0])
+					//fmt.Println(coinName)
 				})
 
-				e.ForEach("div.cion-item.coin-price-large", func(_ int, el *colly.HTMLElement) {
+				e.ForEach("div.priceValue", func(_ int, el *colly.HTMLElement) {
 					coinResult := el.ChildText("span")
 					coinResult = strings.ReplaceAll(coinResult, "$", "")
+					coinResult = strings.ReplaceAll(coinResult, ",", "")
 					result, err := strconv.ParseFloat(coinResult, 8)
 					data[coinName] = fmt.Sprintf("%f", result)
 					//fmt.Println(time.Now().Format("01-02-2006 15:04:05"), coinName, coinResult)
